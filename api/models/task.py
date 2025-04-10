@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime  # ← DateTime を追加！
-
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -11,9 +10,10 @@ class Task(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(1024))
-    due_date = Column(DateTime, nullable=True)  # ← 締切日カラムを追加
+    due_date = Column(DateTime, nullable=True)
 
-    done = relationship("Done", back_populates="task", cascade="delete")
+    # Doneとの1対1リレーション（uselist=False が超重要！）
+    done = relationship("Done", back_populates="task", cascade="delete", uselist=False)
 
 
 class Done(Base):
@@ -21,4 +21,5 @@ class Done(Base):
 
     id = Column(Integer, ForeignKey("tasks.id"), primary_key=True)
 
+    # Taskとのリレーション
     task = relationship("Task", back_populates="done")

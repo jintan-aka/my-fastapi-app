@@ -118,3 +118,32 @@ async def test_update_task_deadline(async_client):
     assert update.status_code == starlette.status.HTTP_200_OK
     assert update.json()["due_date"].startswith("2025-04-20")
 
+from datetime import datetime, timedelta
+
+@pytest.mark.asyncio
+async def test_get_tasks_due_today(async_client):
+    today_iso = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+    tomorrow_iso = (datetime.now() + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+
+    # 今日締切のタスク
+    await async_client.post("/tasks", json={
+        "title": "今日の締切タスク",
+        "due_date": today_iso
+    })
+
+    # 明日締切のタスク
+    await async_client.post("/tasks", json={
+        "title": "明日のタスク",
+        "due_date": tomorrow_iso
+    })
+
+    # 締切タスク取得
+    response = await async_client.get("/tasks/due-today")
+    assert response.status_code == 200
+    data = response.json()
+    
+    titles = [task["title"] for task in data]
+    assert "今日の締切タスク" in titles
+    assert "明日のタスク" not in titles
+
+    

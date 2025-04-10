@@ -37,3 +37,23 @@ async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)):
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return await task_crud.delete_task(db, original=task)
+
+
+@router.get("/tasks/today", response_model=List[task_schema.Task])
+async def list_tasks_due_today(db: AsyncSession = Depends(get_db)):
+    return await task_crud.get_tasks_due_today(db)
+
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import List
+
+import api.models.task as task_model
+import api.schemas.task as task_schema
+from api.db import get_db
+import api.cruds.task as task_crud  # ← 忘れずに！
+
+# すでにある router = APIRouter() を使って...
+
+@router.get("/tasks/due-today", response_model=List[task_schema.Task])
+async def tasks_due_today(db: AsyncSession = Depends(get_db)):
+    return await task_crud.get_tasks_due_today(db)
