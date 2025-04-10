@@ -76,3 +76,10 @@ async def test_done_flag(async_client):
     # 2回目の完了フラグOFFは404
     response = await async_client.delete("/tasks/1/done")
     assert response.status_code == starlette.status.HTTP_404_NOT_FOUND
+
+@pytest.mark.asyncio
+async def test_calc_pow(async_client):
+    response = await async_client.post("/calc_pow", json={"input": 3})
+    assert response.status_code == 200
+    result = response.json()
+    assert result["ans"] == 9
