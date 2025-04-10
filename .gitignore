@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+.env
+.venv/
+.envrc
+
+poetry.lock
+*.log
+
+# macOS
+.DS_Store
+
+# Docker
+.dockervenv/
+mysql_data/
