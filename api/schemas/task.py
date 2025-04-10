@@ -1,13 +1,11 @@
 from typing import Optional
-
-from pydantic import BaseModel, Field
-
+from pydantic import BaseModel, Field, ConfigDict  # ← ConfigDictを追加
 from datetime import datetime
 
 
 class TaskBase(BaseModel):
-    title: Optional[str] = Field(None, example="クリーニングを取りに行く")
-    due_date: Optional[datetime] = Field(None, example="2025-04-30T12:00:00")  # ← 追加！
+    title: Optional[str] = Field(None, json_schema_extra={"example": "クリーニングを取りに行く"})
+    due_date: Optional[datetime] = Field(None, json_schema_extra={"example": "2025-04-30T12:00:00"})
 
 
 class TaskCreate(TaskBase):
@@ -16,16 +14,13 @@ class TaskCreate(TaskBase):
 
 class TaskCreateResponse(TaskCreate):
     id: int
-    due_date: Optional[datetime] 
+    due_date: Optional[datetime]
 
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Task(TaskBase):
     id: int
     done: bool = Field(False, description="完了フラグ")
 
-    class Config:
-        from_attributes = True  
+    model_config = ConfigDict(from_attributes=True)

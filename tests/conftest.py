@@ -15,7 +15,8 @@ engine_test = create_async_engine(DATABASE_URL, echo=True, poolclass=NullPool)
 AsyncSessionLocal = async_sessionmaker(engine_test, expire_on_commit=False)
 
 # DB初期化（テーブル作成 → テスト終了後に削除）
-@pytest_asyncio.fixture(scope="session", autouse=True)
+# ✅ 安全な修正：functionスコープに統一
+@pytest_asyncio.fixture(scope="function", autouse=True)
 async def prepare_database():
     async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

@@ -1,8 +1,6 @@
-from pydantic import BaseModel
-
+from pydantic import BaseModel, ConfigDict  # ← 追加！
 
 class DoneResponse(BaseModel):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)  # ✅ これがv2スタイル！
