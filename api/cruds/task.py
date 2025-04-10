@@ -7,7 +7,7 @@ import api.schemas.task as task_schema
 async def create_task(
     db: AsyncSession, task_create: task_schema.TaskCreate
 ) -> task_model.Task:
-    task = task_model.Task(**task_create.dict())
+    task = task_model.Task(**task_create.dict())  # ← ここで dict() の中に deadline も含まれる
     db.add(task)
     await db.commit()
     await db.refresh(task)
@@ -47,10 +47,12 @@ async def update_task(
     db: AsyncSession, task_create: task_schema.TaskCreate, original: task_model.Task
 ) -> task_model.Task:
     original.title = task_create.title
+    original.due_date = task_create.due_date  # ← 締切日を追加
     db.add(original)
     await db.commit()
     await db.refresh(original)
     return original
+
 
 async def delete_task(db: AsyncSession, original: task_model.Task) -> None:
     await db.delete(original)

@@ -83,3 +83,38 @@ async def test_calc_pow(async_client):
     assert response.status_code == 200
     result = response.json()
     assert result["ans"] == 9
+
+
+from datetime import date
+
+
+@pytest.mark.asyncio
+async def test_create_task_with_deadline(async_client):
+    response = await async_client.post("/tasks", json={
+       "title": "締切付きタスク",
+       "due_date": "2025-04-15"
+    })
+    assert response.status_code == starlette.status.HTTP_200_OK
+    data = response.json()
+    assert data["title"] == "締切付きタスク"
+    assert data["due_date"].startswith("2025-04-15")
+
+
+
+@pytest.mark.asyncio
+async def test_update_task_deadline(async_client):
+    # タスクを先に作成
+    create = await async_client.post("/tasks", json={
+        "title": "締切を更新するタスク",
+        "due_date": "2025-04-10"
+    })
+    task_id = create.json()["id"]
+
+    # 締切を更新
+    update = await async_client.put(f"/tasks/{task_id}", json={
+        "title": "締切を更新するタスク",
+        "due_date": "2025-04-20"
+    })
+    assert update.status_code == starlette.status.HTTP_200_OK
+    assert update.json()["due_date"].startswith("2025-04-20")
+
